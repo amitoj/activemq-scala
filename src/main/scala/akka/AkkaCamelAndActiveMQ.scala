@@ -8,21 +8,25 @@ import org.apache.activemq.ScheduledMessage._
 case class Message(body: String)
 
 class SimpleProducer() extends Actor with Producer with Oneway {
-  override def endpointUri: String = "TEST.FOO"
+  override def endpointUri: String = "activemq:TEST.FOO"
 }
 
 class SimpleConsumer extends Actor with Consumer {
-  override def endpointUri: String = "TEST.FOO"
+  override def endpointUri: String = "activemq:TEST.FOO"
   override def receive: Receive = {
     case msg: CamelMessage => println(msg)
   }
 }
 
+// NOT WORKING
+//TODO: FIX ERRORS
+
 object AkkaCamelAndActiveMQ extends App {
   val actorSystem = ActorSystem("CamelTesting")
   val system = CamelExtension(actorSystem)
 
-  val activeMqUrl: String = "failover://(tcp://192.168.203.***:61616,tcp://192.168.203.***:61616)"
+  //val activeMqUrl: String = "failover://(tcp://192.168.203.176:61616,tcp://192.168.203.177:61616)"
+  val activeMqUrl: String = "nio://192.168.203.176:61616"
   system.context.addComponent("activemq", ActiveMQComponent.activeMQComponent(activeMqUrl))
 
   val simpleProducer = actorSystem.actorOf(Props[SimpleProducer])
